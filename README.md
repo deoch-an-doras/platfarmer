@@ -1,2 +1,2 @@
 # side-scroller
-side scrolling tutorial
+side scrolling farming game
