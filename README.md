@@ -1,2 +1,2 @@
-# side-scroller
+# platfarmer
 side scrolling farming game
