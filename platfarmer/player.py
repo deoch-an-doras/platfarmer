@@ -1,6 +1,7 @@
 import pygame as pg
 import constants as cst
 
+
 vec = pg.math.Vector2  # 2 for two dimensional
 
 
@@ -19,19 +20,21 @@ class Player(pg.sprite.Sprite):
         self.surf.fill(self.color)
 
         self.acc_rate = 0.5
-        self.friction = -0.15
 
         self.rect = self.surf.get_rect(center = self.pos)
         self.jumping = False
-        self.scrolling_left = False
-        self.scrolling_right = False
+        self.ducking = False
+        self.scrolling = [False, False]
+        self.growing = False
+
+        self.platform_collisions = []
+        self.field_collisions = []
 
     def jump(self):
 
         if self.vel.y > -1:
-            self.vel.y -= 15
+            self.vel.y = -15
         self.jumping= False
-
 
     def move(self):
     
@@ -40,14 +43,47 @@ class Player(pg.sprite.Sprite):
         self.rect.center = self.pos
 
     def scroll(self):
-        if self.collisions:
-            if self.scrolling_left:
+        if self.platform_collisions:
+            if self.scrolling[0] :
                 self.acc.x = -self.acc_rate
-            if self.scrolling_right:
+            if self.scrolling[1]:
                 self.acc.x = self.acc_rate
-            if self.scrolling_right and self.scrolling_left:
+            if all(self.scrolling):
                 self.acc.x = 0
-    
+
+   
+
+    def update(self):
+        self.acc = vec(0,cst.GRAVITY)
+
+        self.update_platform_collisions()
+        self.update_field_collisions()
+
+        if any(self.scrolling):
+            self.scroll()
+
+        if self.jumping:
+            self.jump()
+
+        self.edge_case()
+
+        self.move()
+
+    def update_platform_collisions(self):
+        if self.platform_collisions:
+            platform = self.platform_collisions[0]
+            if self.vel.y > 0:
+                if platform.duckable and (self.ducking or platform.being_ducked):
+                    pass
+                else:
+                    self.pos.y = platform.rect.top-self.height/2
+                    self.vel.y = 0
+            self.acc.x += self.vel.x * platform.friction
+        
+
+    def update_field_collisions(self):
+        # self.field_collisions = pg.sprite.spritecollide(self, fields, False)
+        pass
 
     def edge_case(self):
 
@@ -58,28 +94,3 @@ class Player(pg.sprite.Sprite):
         if self.pos.x <= self.width/2:
             self.pos.x = self.width/2
             self.vel.x = -self.vel.x
-
-    def update(self, platforms):
-        self.acc = vec(0,cst.GRAVITY)
-
-        self.check_collide(platforms)
-
-        if self.scrolling_left or self.scrolling_right:
-            self.scroll()
-
-        if self.jumping:
-            self.jump()
-
-        if self.collisions:
-            self.acc.x += self.vel.x * self.friction
-
-        self.edge_case()
-
-
-        self.move()
-
-    def check_collide(self, platforms):
-        self.collisions = pg.sprite.spritecollide(self , platforms, False)
-        if self.collisions:
-            self.pos.y = self.collisions[0].rect.top -self.height/2
-            self.vel.y = 0
