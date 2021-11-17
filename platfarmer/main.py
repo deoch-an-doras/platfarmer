@@ -6,6 +6,7 @@ import constants as cst
 from plat import  Platform
 from player import Player
 from field import Field
+from camera import Camera
 
 
 pg.init()
@@ -28,6 +29,8 @@ class Platfarmer:
 
         self.player = Player()
         self.all_sprites.add(self.player)
+
+        self.camera = Camera(self.size)
 
         for pos in [(200, 440, 400, 20,False), (200, 350, 100, 20), 
                     (100, 290, 50,20), (270, 220, 70, 20),
@@ -73,6 +76,10 @@ class Platfarmer:
         self.update_player()
         self.update_fields()
         self.update_platforms()
+        self.update_camera()
+
+    def update_camera(self):
+        self.camera.update(self.player.pos)
 
     def update_collisions(self):
         self.platform_collisions = pg.sprite.spritecollide(self.player, self.platforms, False)
@@ -122,7 +129,8 @@ class Platfarmer:
     def draw(self):
         self.window.fill((255,255,255))
         for sprite in self.all_sprites:
-            self.window.blit(sprite.surf, sprite.rect)
+            self.window.blit(sprite.surf, (sprite.rect.x, 
+                        sprite.rect.y-self.camera.pos.y))
 
     def quit(self):
         pg.quit()
