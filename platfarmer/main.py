@@ -12,6 +12,33 @@ from camera import Camera
 pg.init()
 pg.display.set_caption('Platfarmer')
 
+FLOOR = (200, 0, 400, 20)
+
+INIT_PLATS = [#( x ,  y ,  w ,   h)
+                (210, 110, 90, 20),
+                (270, 220, 70, 20),
+                (100, 290, 50, 20), 
+                (200, 350, 100, 20), 
+                (120, 410, 40, 20),
+                (25, 510, 45, 20),
+                (100, 580, 90, 20),
+                (90, 660, 120, 20),                
+                ]
+
+CAN = (120, 30, 60, 50)
+
+
+class Can(pg.sprite.Sprite):
+
+    def __init__(self, x, y, w, h):
+
+        super().__init__()
+        self.surf = pg.image.load('./resources/can.png').convert_alpha()
+        self.surf = pg.transform.scale(self.surf, (w, h))
+        self.rect = self.surf.get_rect(center = (x, -y+cst.HEIGHT-h/2))
+
+
+
 class Platfarmer:
 
     def __init__(self):
@@ -31,13 +58,29 @@ class Platfarmer:
         self.all_sprites.add(self.player)
 
         self.camera = Camera(self.size)
+        self._platforms = []
 
-        for pos in [(200, 440, 400, 20,False), (200, 350, 100, 20), 
-                    (100, 290, 50,20), (270, 220, 70, 20),
-                    (210, 110, 90, 20)]:
-            platform = Platform(*pos)
-            self.all_sprites.add(platform)
+        self.floor = pg.sprite.Group()
+
+        self.init_platforms()
+
+
+    def init_platforms(self):
+        floor = Platform(*FLOOR, False)
+        self.floor.add(floor)
+        self.platforms.add(floor)
+        self.all_sprites.add(floor)
+
+        for plat in INIT_PLATS:
+            platform = Platform(*plat)
             self.platforms.add(platform)
+            self.all_sprites.add(platform)
+
+        self.cans = pg.sprite.Group()
+        can = Can(*CAN)
+
+        self.all_sprites.add(can)
+        self.cans.add(can)
 
     def events(self):
         for event in pg.event.get():
@@ -109,11 +152,14 @@ class Platfarmer:
             field.update()
 
     def update_platforms(self):
+
         for platform in self.platform_collisions:
             if self.player.ducking and not platform.being_ducked:
                 platform.duck_start = pg.time.get_ticks()
                 platform.being_ducked = True
             platform.update()
+
+
 
     def mainloop(self):
 

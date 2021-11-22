@@ -8,10 +8,10 @@ vec = pg.math.Vector2
 class Platform(pg.sprite.Sprite):
     def __init__(self, x,y,w,h, duckable=True, friction=-0.15):
         super().__init__()
-        
+
         self.surf = pg.Surface((w, h))
         self.surf.fill((255,0,0))
-        self.rect = self.surf.get_rect(center = (x, y))
+        self.rect = self.surf.get_rect(center = (x, -y+cst.HEIGHT-h/2))
         self.duckable = duckable
         self.friction = friction
         self.being_ducked = False

@@ -25,11 +25,11 @@ class Field(pg.sprite.Sprite):
 
         self.cmap = make_cmap(self.green, self.brown, self.age_levels)
 
-
         self.birth_time = pg.time.get_ticks()
         self.death_time = self.birth_time + 5000
         self.age_ticks = 0
         self.age_level = 0
+        self.age_fraction = 0
         self.color=self.green
         self.surf.fill(self.color)
         self.growing=False
@@ -41,12 +41,15 @@ class Field(pg.sprite.Sprite):
         self.surf.fill(self.color) 
 
     def update_age(self):
-        self.age_ticks = pg.time.get_ticks() - self.birth_time
-        self.age_level = int(self.age_ticks*self.age_levels/self.death_time)
+        self.age_ticks = min(self.death_time, max(0, pg.time.get_ticks() - self.birth_time))
+        self.age_fraction = self.age_ticks/self.death_time
+        self.age_level = int(self.age_fraction*self.age_levels)
+
         
     def update(self):
         if self.growing:
-            self.birth_time += 400
+            self.birth_time += 200
             self.birth_time = min(self.birth_time, pg.time.get_ticks())
+        
         self.update_age()
         self.update_color()
