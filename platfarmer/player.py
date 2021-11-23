@@ -5,7 +5,6 @@ import constants as cst
 vec = pg.math.Vector2  # 2 for two dimensional
 
 
-
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -49,9 +48,7 @@ class Player(pg.sprite.Sprite):
             if self.scrolling[1]:
                 self.acc.x = self.acc_rate
             if all(self.scrolling):
-                self.acc.x = 0
-
-   
+                self.acc.x = 0   
 
     def update(self):
         self.acc = vec(0,cst.GRAVITY)

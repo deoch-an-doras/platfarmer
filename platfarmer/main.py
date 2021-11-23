@@ -7,7 +7,7 @@ from plat import  Platform
 from player import Player
 from field import Field
 from camera import Camera
-
+from can import Can
 
 pg.init()
 pg.display.set_caption('Platfarmer')
@@ -25,19 +25,8 @@ INIT_PLATS = [#( x ,  y ,  w ,   h)
                 (90, 660, 120, 20),                
                 ]
 
-CAN = (120, 30, 60, 50)
-
-
-class Can(pg.sprite.Sprite):
-
-    def __init__(self, x, y, w, h):
-
-        super().__init__()
-        self.surf = pg.image.load('./resources/can.png').convert_alpha()
-        self.surf = pg.transform.scale(self.surf, (w, h))
-        self.rect = self.surf.get_rect(center = (x, -y+cst.HEIGHT-h/2))
-
-
+CANS = [(120, 30, 200, 200),
+         (240, 320, 200, 200)]
 
 class Platfarmer:
 
@@ -53,6 +42,7 @@ class Platfarmer:
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.fields = pg.sprite.Group()
+        self.cans = pg.sprite.Group()
 
         self.player = Player()
         self.all_sprites.add(self.player)
@@ -75,12 +65,10 @@ class Platfarmer:
             platform = Platform(*plat)
             self.platforms.add(platform)
             self.all_sprites.add(platform)
-
-        self.cans = pg.sprite.Group()
-        can = Can(*CAN)
-
-        self.all_sprites.add(can)
-        self.cans.add(can)
+        for can in CANS:
+            can = Can(*can)
+            self.cans.add(can)
+            self.all_sprites.add(can)
 
     def events(self):
         for event in pg.event.get():
@@ -120,16 +108,19 @@ class Platfarmer:
         self.update_fields()
         self.update_platforms()
         self.update_camera()
+        self.update_cans()
+
+    def update_cans(self):
+        pass
+
 
     def update_camera(self):
         self.camera.update(self.player.pos)
 
     def update_collisions(self):
-        self.platform_collisions = pg.sprite.spritecollide(self.player, self.platforms, False)
-        self.player.platform_collisions = self.platform_collisions
-
-        self.field_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
-        self.player.field_collisions = self.field_collisions
+        self.player.platform_collisions = pg.sprite.spritecollide(self.player, self.platforms, False)
+        self.player.field_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
+        self.player.can_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
 
     def update_player(self):
         self.player.update()
@@ -153,7 +144,7 @@ class Platfarmer:
 
     def update_platforms(self):
 
-        for platform in self.platform_collisions:
+        for platform in self.player.platform_collisions:
             if self.player.ducking and not platform.being_ducked:
                 platform.duck_start = pg.time.get_ticks()
                 platform.being_ducked = True
@@ -177,6 +168,9 @@ class Platfarmer:
         for sprite in self.all_sprites:
             self.window.blit(sprite.surf, (sprite.rect.x, 
                         sprite.rect.y-self.camera.pos.y))
+        self.window.blit(self.player.surf, (self.player.rect.x, 
+                        self.player.rect.y-self.camera.pos.y))
+        
 
     def quit(self):
         pg.quit()
