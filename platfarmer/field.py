@@ -32,9 +32,10 @@ class Field(pg.sprite.Sprite):
         self.age_fraction = 0
         self.color=self.green
         self.surf.fill(self.color)
-        self.growing=False
 
         self.rect = self.surf.get_rect(center = (self.x, self.y))
+        self._layer = 1
+        print(self._layer)
 
     def update_color(self):
         self.color = tuple([int(i*255) for i in self.cmap(self.age_level)])
@@ -46,10 +47,12 @@ class Field(pg.sprite.Sprite):
         self.age_level = int(self.age_fraction*self.age_levels)
 
         
-    def update(self):
-        if self.growing:
-            self.birth_time += 200
-            self.birth_time = min(self.birth_time, pg.time.get_ticks())
+    def update(self, player):
+
+        if self in player.field_collisions:
+            if player.growing:
+                self.birth_time += 200
+                self.birth_time = min(self.birth_time, pg.time.get_ticks())
         
         self.update_age()
         self.update_color()

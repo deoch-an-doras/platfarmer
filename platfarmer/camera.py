@@ -11,3 +11,7 @@ class Camera():
 
     def update(self, pos):
         self.pos.y = min(0, pos.y-self.H/2)
+
+    def translate(self, sprite):
+        return (sprite.rect.x, sprite.rect.y-self.pos.y)
+                        

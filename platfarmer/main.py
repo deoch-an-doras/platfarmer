@@ -8,6 +8,7 @@ from player import Player
 from field import Field
 from camera import Camera
 from can import Can
+from inventory import InventoryDisplay
 
 pg.init()
 pg.display.set_caption('Platfarmer')
@@ -36,39 +37,31 @@ class Platfarmer:
         self.height, self.width = self.size = cst.SIZE
 
         self.clock = pg.time.Clock()
-        self.fps = 60
+        self.fps = cst.FPS
         self.window = pg.display.set_mode(self.size)
+        self.bgcolour = cst.BGCOLOUR
 
-        self.all_sprites = pg.sprite.Group()
+        self.all_sprites = pg.sprite.LayeredUpdates()
+        self.cans = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.fields = pg.sprite.Group()
-        self.cans = pg.sprite.Group()
 
         self.player = Player()
         self.all_sprites.add(self.player)
 
         self.camera = Camera(self.size)
-        self._platforms = []
-
-        self.floor = pg.sprite.Group()
+        self.inventorydisplay = InventoryDisplay()  
 
         self.init_platforms()
 
 
     def init_platforms(self):
         floor = Platform(*FLOOR, False)
-        self.floor.add(floor)
-        self.platforms.add(floor)
-        self.all_sprites.add(floor)
-
+        self.add_sprite(floor,self.platforms)
         for plat in INIT_PLATS:
-            platform = Platform(*plat)
-            self.platforms.add(platform)
-            self.all_sprites.add(platform)
+            self.add_sprite(Platform(*plat), self.platforms)
         for can in CANS:
-            can = Can(*can)
-            self.cans.add(can)
-            self.all_sprites.add(can)
+            self.add_sprite(Can(*can), self.cans)
 
     def events(self):
         for event in pg.event.get():
@@ -103,54 +96,45 @@ class Platfarmer:
                     
                 
     def update(self):
-        self.update_collisions()
         self.update_player()
         self.update_fields()
         self.update_platforms()
-        self.update_camera()
         self.update_cans()
+        self.update_camera()
 
     def update_cans(self):
         pass
 
-
     def update_camera(self):
         self.camera.update(self.player.pos)
 
-    def update_collisions(self):
+    def update_player(self):
+        
         self.player.platform_collisions = pg.sprite.spritecollide(self.player, self.platforms, False)
         self.player.field_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
         self.player.can_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
 
-    def update_player(self):
         self.player.update()
 
     def update_fields(self):
-        if self.player.growing:
-            if not self.player.field_collisions:
-                if self.player.platform_collisions:
-                    platform = self.player.platform_collisions[0]
-                    field = Field(platform)
-                    self.fields.add(field)
-                    self.all_sprites.add(field)
-            else:
-                self.player.field_collisions[0].growing = True
-        else:
-            for field in self.fields: 
-                field.growing = False
 
         for field in self.fields:
-            field.update()
+            field.update(self.player)
 
     def update_platforms(self):
+        for platform in self.platforms:
+            platform.update(self.player)
+            if platform.needs_field:
+                self.add_sprite(Field(platform), self.fields)
+                platform.needs_field = False
 
-        for platform in self.player.platform_collisions:
-            if self.player.ducking and not platform.being_ducked:
-                platform.duck_start = pg.time.get_ticks()
-                platform.being_ducked = True
-            platform.update()
+    def add_sprites(self, sprites, group):
+        for sprite in sprites:
+            self.add_sprite(sprite, group)
 
-
+    def add_sprite(self, sprite, group):
+        group.add(sprite)
+        self.all_sprites.add(sprite)
 
     def mainloop(self):
 
@@ -163,14 +147,12 @@ class Platfarmer:
             pg.display.update()
             self.clock.tick(self.fps)
 
+
     def draw(self):
         self.window.fill((255,255,255))
         for sprite in self.all_sprites:
-            self.window.blit(sprite.surf, (sprite.rect.x, 
-                        sprite.rect.y-self.camera.pos.y))
-        self.window.blit(self.player.surf, (self.player.rect.x, 
-                        self.player.rect.y-self.camera.pos.y))
-        
+            self.window.blit(sprite.surf, self.camera.translate(sprite))
+        self.window.blit(self.player.surf, self.camera.translate(self.player))
 
     def quit(self):
         pg.quit()
