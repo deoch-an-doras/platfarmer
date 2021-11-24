@@ -8,7 +8,6 @@ class Camera():
         self.W, self.H = self.size = size
         self.pos = vec(0,0)
 
-
     def update(self, pos):
         self.pos.y = min(0, pos.y-self.H/2)
 

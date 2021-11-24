@@ -3,13 +3,24 @@ import constants as cst
 
 class InventoryDisplay(pg.sprite.Sprite):
 
-    def __init__(self, x=10,y=10,w=300,h=100, duckable=True, friction=-0.15):
+    def __init__(self, w=300, h=100):
         super().__init__()
-        # self.window = pg.display.set_mode((w,h))
-        # self.surf = pg.Surface((w, h)).convert()
-        # self.surf.fill((0,0,0,0))
-        # self.rect = self.surf.get_rect(center = (x, -y+cst.HEIGHT-h/2))
-        # pg.draw.rect(self.surf, (255,0,0, 255), self.rect, width=1)
+        self.bboxsurf = pg.Surface((w, h)).convert_alpha()
+        self.bboxsurf.fill((0,0,0,0))
+        self.bboxrect = self.bboxsurf.get_rect(topleft = (0,0))
+        pg.draw.rect(self.bboxsurf, (255,0,0, 255), self.bboxrect, width=1)
+
+        self.cansurf = pg.image.load('./resources/can.png').convert_alpha()
+        # self.cansurf = pg.transform.scale(self.cansurf, (w, h))
+        self.canrect = self.cansurf.get_rect(topleft = (10, 10))
+
+
+
+    def blit(self, window, topleft=(0,0)):
+        window.blit(self.bboxsurf, topleft)
+        print(self.canrect.topleft)
+        window.blit(self.cansurf, self.canrect.topleft+topleft)
+
 
 # class Inventory(pg.sprite.Sprite):
 

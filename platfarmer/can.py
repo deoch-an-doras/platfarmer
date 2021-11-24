@@ -9,5 +9,5 @@ class Can(pg.sprite.Sprite):
         super().__init__()
         self.surf = pg.image.load('./resources/can.png').convert_alpha()
         self.surf = pg.transform.scale(self.surf, (w, h))
-        self.rect = self.surf.get_rect(center = (x, -y+cst.HEIGHT-h/2))
+        self.rect = self.surf.get_rect(center = (x, cst.HEIGHT-h/2-y))
         self._layer = 0

@@ -93,8 +93,7 @@ class Platfarmer:
                     self.player.growing = False
                 elif event.key == pg.K_DOWN:
                     self.player.ducking=False
-                    
-                
+                                 
     def update(self):
         self.update_player()
         self.update_fields()
@@ -147,18 +146,15 @@ class Platfarmer:
             pg.display.update()
             self.clock.tick(self.fps)
 
-
     def draw(self):
         self.window.fill((255,255,255))
         for sprite in self.all_sprites:
             self.window.blit(sprite.surf, self.camera.translate(sprite))
         self.window.blit(self.player.surf, self.camera.translate(self.player))
-
+        self.inventorydisplay.blit(self.window)
     def quit(self):
         pg.quit()
         sys.exit()
 
-
 g = Platfarmer()
-
 g.mainloop()
