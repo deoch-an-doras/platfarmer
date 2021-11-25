@@ -18,7 +18,6 @@ class InventoryDisplay(pg.sprite.Sprite):
 
     def blit(self, window, topleft=(0,0)):
         window.blit(self.bboxsurf, topleft)
-        print(self.canrect.topleft)
         window.blit(self.cansurf, self.canrect.topleft+topleft)
 
 

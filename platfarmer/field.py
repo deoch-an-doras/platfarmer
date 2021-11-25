@@ -11,6 +11,7 @@ def make_cmap(col1, col2, N):
 
 class Field(pg.sprite.Sprite):
 
+
     def __init__(self, platform):
         super().__init__()
 
@@ -35,7 +36,6 @@ class Field(pg.sprite.Sprite):
 
         self.rect = self.surf.get_rect(center = (self.x, self.y))
         self._layer = 1
-        print(self._layer)
 
     def update_color(self):
         self.color = tuple([int(i*255) for i in self.cmap(self.age_level)])
@@ -49,7 +49,7 @@ class Field(pg.sprite.Sprite):
         
     def update(self, player):
 
-        if self in player.field_collisions:
+        if self in player.collisions:
             if player.growing:
                 self.birth_time += 200
                 self.birth_time = min(self.birth_time, pg.time.get_ticks())

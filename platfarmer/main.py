@@ -26,8 +26,8 @@ INIT_PLATS = [#( x ,  y ,  w ,   h)
                 (90, 660, 120, 20),                
                 ]
 
-CANS = [(120, 30, 200, 200),
-         (240, 320, 200, 200)]
+CANS = [(120, 30, 64, 64),
+         (280, 350, 64, 64)]
 
 class Platfarmer:
 
@@ -102,17 +102,16 @@ class Platfarmer:
         self.update_camera()
 
     def update_cans(self):
-        pass
+        for can in self.cans:
+            can.update(self.player)
 
     def update_camera(self):
         self.camera.update(self.player.pos)
 
     def update_player(self):
-        
-        self.player.platform_collisions = pg.sprite.spritecollide(self.player, self.platforms, False)
-        self.player.field_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
-        self.player.can_collisions = pg.sprite.spritecollide(self.player, self.fields, False)
-
+        self.player.collisions = pg.sprite.spritecollide(self.player, self.all_sprites, False)
+        self.player.platform_collisions = [s for s in self.player.collisions if isinstance(s, Platform)]
+        self.player.field_collisions = [s for s in self.player.collisions if isinstance(s, Field)]
         self.player.update()
 
     def update_fields(self):
@@ -152,6 +151,7 @@ class Platfarmer:
             self.window.blit(sprite.surf, self.camera.translate(sprite))
         self.window.blit(self.player.surf, self.camera.translate(self.player))
         self.inventorydisplay.blit(self.window)
+
     def quit(self):
         pg.quit()
         sys.exit()

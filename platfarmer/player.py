@@ -26,6 +26,8 @@ class Player(pg.sprite.Sprite):
         self.scrolling = [False, False]
         self.growing = False
 
+        self.cans = 0
+
         self.platform_collisions = []
         self.field_collisions = []
 
@@ -67,6 +69,7 @@ class Player(pg.sprite.Sprite):
         self.move()
 
     def update_platform_collisions(self):
+
         if self.platform_collisions:
             platform = self.platform_collisions[0]
             if self.vel.y > 0:

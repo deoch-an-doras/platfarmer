@@ -6,6 +6,9 @@ pg.init()
 vec = pg.math.Vector2 
 
 class Platform(pg.sprite.Sprite):
+
+    name = 'platform'    
+    
     def __init__(self, x,y,w,h, duckable=True, friction=-0.15):
         super().__init__()
 
@@ -25,8 +28,8 @@ class Platform(pg.sprite.Sprite):
 
     def update(self, player):
 
-        if self in player.platform_collisions:
-            if player.ducking and not self.being_ducked:
+        if self in player.collisions:
+            if player.ducking and self.duckable and not self.being_ducked:
                 self.duck_start = pg.time.get_ticks()
                 self.being_ducked = True
 

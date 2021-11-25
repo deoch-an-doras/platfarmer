@@ -11,3 +11,9 @@ class Can(pg.sprite.Sprite):
         self.surf = pg.transform.scale(self.surf, (w, h))
         self.rect = self.surf.get_rect(center = (x, cst.HEIGHT-h/2-y))
         self._layer = 0
+    
+    def update(self, player):
+        if self in player.collisions:
+            player.cans += 1
+            self.kill()
+            print(player.cans)
