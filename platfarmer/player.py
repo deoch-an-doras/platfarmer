@@ -24,9 +24,9 @@ class Player(pg.sprite.Sprite):
         self.jumping = False
         self.ducking = False
         self.scrolling = [False, False]
-        self.growing = False
+        self.watering = False
 
-        self.cans = 0
+        self.water = 2000
 
         self.platform_collisions = []
         self.field_collisions = []
@@ -55,8 +55,8 @@ class Player(pg.sprite.Sprite):
     def update(self):
         self.acc = vec(0,cst.GRAVITY)
 
-        self.update_platform_collisions()
-        self.update_field_collisions()
+        self.platform_interactions()
+        self.field_interactions()
 
         if any(self.scrolling):
             self.scroll()
@@ -68,22 +68,23 @@ class Player(pg.sprite.Sprite):
 
         self.move()
 
-    def update_platform_collisions(self):
+    def platform_interactions(self):
 
         if self.platform_collisions:
             platform = self.platform_collisions[0]
             if self.vel.y > 0:
-                if platform.duckable and (self.ducking or platform.being_ducked):
-                    pass
-                else:
+                if not (platform.duckable and (self.ducking or platform.being_ducked)):
                     self.pos.y = platform.rect.top-self.height/2
                     self.vel.y = 0
             self.acc.x += self.vel.x * platform.friction
         
 
-    def update_field_collisions(self):
-        # self.field_collisions = pg.sprite.spritecollide(self, fields, False)
-        pass
+    def field_interactions(self):
+        if self.field_collisions:
+            field = self.field_collisions[0]
+            if self.watering and self.water > 0:
+                field.being_watered = True
+                self.water -= 10
 
     def edge_case(self):
 

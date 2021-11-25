@@ -1,5 +1,8 @@
 import sys
+import random
 import pygame as pg
+
+
 
 import constants as cst
 
@@ -9,6 +12,7 @@ from field import Field
 from camera import Camera
 from can import Can
 from inventory import InventoryDisplay
+
 
 pg.init()
 pg.display.set_caption('Platfarmer')
@@ -60,6 +64,9 @@ class Platfarmer:
         self.add_sprite(floor,self.platforms)
         for plat in INIT_PLATS:
             self.add_sprite(Platform(*plat), self.platforms)
+        
+        self.highest_level = min([p.rect.top for p in self.platforms])
+
         for can in CANS:
             self.add_sprite(Can(*can), self.cans)
 
@@ -71,28 +78,29 @@ class Platfarmer:
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_q:
                     self.quit()
-                elif event.key == pg.K_UP:
+                elif event.key in (pg.K_UP, pg.K_w):
                     self.player.jumping = True
-                elif event.key == pg.K_LEFT:
+                elif event.key in (pg.K_LEFT, pg.K_a):
                     self.player.scrolling[0] = True
-                elif event.key == pg.K_RIGHT:
+                elif event.key in (pg.K_RIGHT, pg.K_d):
                     self.player.scrolling[1] = True
-                elif event.key == pg.K_SPACE:
-                    self.player.growing = True
-                elif event.key == pg.K_DOWN:
+                elif event.key in (pg.K_DOWN, pg.K_s):
                     self.player.ducking = True
+                elif event.key == pg.K_SPACE:
+                    self.player.watering = True
 
             elif event.type == pg.KEYUP:
-                if event.key == pg.K_LEFT:
+                if event.key in (pg.K_LEFT, pg.K_a):
                     self.player.scrolling[0] = False
-                elif event.key == pg.K_RIGHT:
+                elif event.key in (pg.K_RIGHT, pg.K_d):
                     self.player.scrolling[1] = False
-                elif event.key == pg.K_UP:
+                elif event.key in (pg.K_UP, pg.K_w):
                     self.player.jumping = False
-                elif event.key == pg.K_SPACE:
-                    self.player.growing = False
-                elif event.key == pg.K_DOWN:
+                elif event.key in (pg.K_DOWN, pg.K_s):
                     self.player.ducking=False
+                elif event.key == pg.K_SPACE:
+                    self.player.watering = False
+
                                  
     def update(self):
         self.update_player()
@@ -100,6 +108,7 @@ class Platfarmer:
         self.update_platforms()
         self.update_cans()
         self.update_camera()
+        self.update_inventory()
 
     def update_cans(self):
         for can in self.cans:
@@ -115,7 +124,7 @@ class Platfarmer:
         self.player.update()
 
     def update_fields(self):
-
+        
         for field in self.fields:
             field.update(self.player)
 
@@ -125,7 +134,23 @@ class Platfarmer:
             if platform.needs_field:
                 self.add_sprite(Field(platform), self.fields)
                 platform.needs_field = False
+                platform.field_exists = True
+        self.spawn_new_platform()
 
+    def update_inventory(self):
+        self.inventorydisplay.update(self.player)
+
+    def spawn_new_platform(self):
+
+        if self.camera.pos.y < self.highest_level+self.height/2:
+            w = random.randint(int(self.width/8),int(self.width/2))
+            x = random.randint(0,self.width-w)
+            y = random.randint(self.highest_level-300,self.highest_level)-int(self.height/2)
+            plat = Platform(x,-y,w,20)
+            self.add_sprite(plat, self.platforms)
+            self.highest_level = y
+            print(y, self.highest_level)
+            
     def add_sprites(self, sprites, group):
         for sprite in sprites:
             self.add_sprite(sprite, group)

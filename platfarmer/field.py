@@ -22,15 +22,17 @@ class Field(pg.sprite.Sprite):
 
         self.green  = (4, 188, 43)
         self.brown = (101, 57, 33)
-        self.age_levels = 4
+        self.age_levels = 3
 
         self.cmap = make_cmap(self.green, self.brown, self.age_levels)
 
         self.birth_time = pg.time.get_ticks()
-        self.death_time = self.birth_time + 5000
+        self.lifespan = 5000
+        self.death_time = self.birth_time + self.lifespan
         self.age_ticks = 0
         self.age_level = 0
         self.age_fraction = 0
+        self.being_watered = False
         self.color=self.green
         self.surf.fill(self.color)
 
@@ -48,11 +50,9 @@ class Field(pg.sprite.Sprite):
 
         
     def update(self, player):
-
-        if self in player.collisions:
-            if player.growing:
-                self.birth_time += 200
-                self.birth_time = min(self.birth_time, pg.time.get_ticks())
-        
+        if self.being_watered:
+            self.birth_time += 200
+            self.birth_time = min(self.birth_time, pg.time.get_ticks())
+        self.being_watered = False
         self.update_age()
         self.update_color()

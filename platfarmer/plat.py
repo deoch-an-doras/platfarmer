@@ -23,7 +23,7 @@ class Platform(pg.sprite.Sprite):
         self.duck_start = 0
 
         self.needs_field = False
-        self.field = None
+        self.field_exists = False
         self._layer = 1
 
     def update(self, player):
@@ -33,7 +33,7 @@ class Platform(pg.sprite.Sprite):
                 self.duck_start = pg.time.get_ticks()
                 self.being_ducked = True
 
-            if player.growing and self.field is None:
+            if player.watering and not self.field_exists:
                 self.needs_field = True
 
 
