@@ -23,15 +23,11 @@ INIT_PLATS = [#( x ,  y ,  w ,   h)
                 (210, 110, 90, 20),
                 (270, 220, 70, 20),
                 (100, 290, 50, 20), 
-                (200, 350, 100, 20), 
-                (120, 410, 40, 20),
-                (25, 510, 45, 20),
-                (100, 580, 90, 20),
-                (90, 660, 120, 20),                
+                (200, 350, 100, 20),                
                 ]
 
-CANS = [(120, 30, 64, 64),
-         (280, 350, 64, 64)]
+CANS = [(120, 30),
+         (280, 350)]
 
 class Platfarmer:
 
@@ -65,7 +61,7 @@ class Platfarmer:
         for plat in INIT_PLATS:
             self.add_sprite(Platform(*plat), self.platforms)
         
-        self.highest_level = min([p.rect.top for p in self.platforms])
+        self.highest_level = min([p.rect.top for p in self.platforms]) -self.height
 
         for can in CANS:
             self.add_sprite(Can(*can), self.cans)
@@ -110,12 +106,16 @@ class Platfarmer:
         self.update_camera()
         self.update_inventory()
 
+
     def update_cans(self):
         for can in self.cans:
             can.update(self.player)
 
     def update_camera(self):
         self.camera.update(self.player.pos)
+
+        self.spawn_new_platform()
+
 
     def update_player(self):
         self.player.collisions = pg.sprite.spritecollide(self.player, self.all_sprites, False)
@@ -132,25 +132,29 @@ class Platfarmer:
         for platform in self.platforms:
             platform.update(self.player)
             if platform.needs_field:
-                self.add_sprite(Field(platform), self.fields)
-                platform.needs_field = False
-                platform.field_exists = True
-        self.spawn_new_platform()
+                self.add_new_field(platform)
+
+
+    def add_new_field(self, platform):
+        self.add_sprite(Field(platform), self.fields)
+        platform.needs_field = False
+        platform.field_exists = True
 
     def update_inventory(self):
         self.inventorydisplay.update(self.player)
 
     def spawn_new_platform(self):
 
-        if self.camera.pos.y < self.highest_level+self.height/2:
+        if abs(self.camera.pos.y) > abs(self.highest_level)-self.height:
             w = random.randint(int(self.width/8),int(self.width/2))
             x = random.randint(0,self.width-w)
-            y = random.randint(self.highest_level-300,self.highest_level)-int(self.height/2)
-            plat = Platform(x,-y,w,20)
-            self.add_sprite(plat, self.platforms)
+            y = random.randint(abs(self.highest_level)+30, abs(self.highest_level)+300)
+            self.add_sprite(Platform(x,y,w,20), self.platforms)
             self.highest_level = y
-            print(y, self.highest_level)
-            
+            if random.random() <0.1:
+                self.add_sprite(Can(x, y+40), self.cans)
+
+
     def add_sprites(self, sprites, group):
         for sprite in sprites:
             self.add_sprite(sprite, group)
