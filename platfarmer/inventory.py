@@ -25,7 +25,8 @@ class InventoryDisplay(pg.sprite.Sprite):
         self.textrect = self.textsurf.get_rect(centery = self.bboxrect.centery, left = self.canrect.right+10)
     
     def update(self, player):
-        self.textsurf = self.font.render(str(player.water), False, (0, 0, 0))
+        waterstring = str(int(player.water/1000))
+        self.textsurf = self.font.render(waterstring, False, (0, 0, 0))
         self.textrect = self.textsurf.get_rect(centery = self.bboxrect.centery, left = self.canrect.right+10)
     
 

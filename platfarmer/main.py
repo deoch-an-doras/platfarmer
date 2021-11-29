@@ -11,8 +11,8 @@ from player import Player
 from field import Field
 from camera import Camera
 from can import Can
+from flower import Flower
 from inventory import InventoryDisplay
-
 
 pg.init()
 pg.display.set_caption('Platfarmer')
@@ -45,6 +45,7 @@ class Platfarmer:
         self.cans = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.fields = pg.sprite.Group()
+        self.flowers = pg.sprite.Group()
 
         self.player = Player()
         self.all_sprites.add(self.player)
@@ -103,6 +104,7 @@ class Platfarmer:
         self.update_fields()
         self.update_platforms()
         self.update_cans()
+        self.update_flowers()
         self.update_camera()
         self.update_inventory()
 
@@ -116,6 +118,9 @@ class Platfarmer:
 
         self.spawn_new_platform()
 
+
+    def update_flowers(self):
+        pass
 
     def update_player(self):
         self.player.collisions = pg.sprite.spritecollide(self.player, self.all_sprites, False)
@@ -153,6 +158,9 @@ class Platfarmer:
             self.highest_level = y
             if random.random() <0.1:
                 self.add_sprite(Can(x, y+40), self.cans)
+            if random.random() <0.9:
+                self.add_sprite(Flower(x, y+10), self.flowers)
+
 
 
     def add_sprites(self, sprites, group):
